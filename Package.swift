@@ -15,7 +15,7 @@ let package = Package(
     .target(
         name: "Beethoven-iOS",
         dependencies: [
-            .product(name: "Pitchy")
+            .byNameItem(name: "Pitchy", condition: .none)
         ]
     )
   ]
