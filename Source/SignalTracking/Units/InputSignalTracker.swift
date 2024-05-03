@@ -14,6 +14,7 @@ final class InputSignalTracker: SignalTracker {
   private var audioEngine: AVAudioEngine?
   private let session = AVAudioSession.sharedInstance()
   private let bus = 0
+  private let automaticallyEnablesVoiceProcessing: Bool
 
   var peakLevel: Float? {
     return audioChannel?.peakHoldLevel
@@ -30,8 +31,10 @@ final class InputSignalTracker: SignalTracker {
   // MARK: - Initialization
 
   required init(bufferSize: AVAudioFrameCount = 2048,
+                automaticallyEnablesVoiceProcessing: Bool = false,
                 delegate: SignalTrackerDelegate? = nil) {
     self.bufferSize = bufferSize
+    self.automaticallyEnablesVoiceProcessing = automaticallyEnablesVoiceProcessing
     self.delegate = delegate
     setupAudio()
   }
@@ -40,7 +43,7 @@ final class InputSignalTracker: SignalTracker {
 
   func start() throws {
     try session.setCategory(AVAudioSession.Category.playAndRecord)
-
+    
     // check input type
     let currentRoute = session.currentRoute
     if currentRoute.outputs.count != 0 {
@@ -54,9 +57,13 @@ final class InputSignalTracker: SignalTracker {
     }
     
     audioEngine = AVAudioEngine()
-
+    
     guard let inputNode = audioEngine?.inputNode else {
       throw InputSignalTrackerError.inputNodeMissing
+    }
+      
+    if automaticallyEnablesVoiceProcessing {
+      try inputNode.setVoiceProcessingEnabled(true)
     }
 
     let format = inputNode.outputFormat(forBus: bus)

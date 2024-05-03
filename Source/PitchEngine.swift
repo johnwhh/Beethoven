@@ -54,7 +54,10 @@ public final class PitchEngine {
       if let audioUrl = config.audioUrl {
         self.signalTracker = OutputSignalTracker(audioUrl: audioUrl, bufferSize: bufferSize)
       } else {
-        self.signalTracker = InputSignalTracker(bufferSize: bufferSize)
+          self.signalTracker = InputSignalTracker(
+            bufferSize: bufferSize,
+            automaticallyEnablesVoiceProcessing: config.automaticallyEnablesVoiceProcessing
+          )
       }
     }
 
